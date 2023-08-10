@@ -20,7 +20,6 @@ def astar(maze, start, end):
     closed_list = []
 
     while len(open_list) > 0:
-        print("running")
         current_node = open_list[0]
         current_index = 0
         for index, item in enumerate(open_list):
@@ -79,3 +78,5 @@ def astar(maze, start, end):
             
             if not skip_child:
                 open_list.append(child)
+    # If there is no path
+    return []

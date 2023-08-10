@@ -1,15 +1,18 @@
 import customtkinter as ctk
 import a_star
-import predefined_setups
-from predefined_setups import course1
+from CTkMessagebox import CTkMessagebox
 
 root = ctk.CTk()
 root._set_appearance_mode("Dark")
 root.title("Pathfinder")
+root.resizable(False, False)
+
+label = ctk.CTkLabel(root, text="Pathfinder - Click/Drag to Create Obstacles", height=50, font=('Helvetica', 20))
+label.grid(row=0, column=0)
 
 box_size = 80
 canvas = ctk.CTkCanvas(root, width = 2000, height=1200)
-canvas.pack()
+canvas.grid(row=1, columnspan=3)
 
 #Initial Grid setup
 grid = [[canvas.create_rectangle(x * box_size, y*box_size, (x+1)*box_size, (y+1)*box_size, fill="white")
@@ -18,8 +21,6 @@ grid = [[canvas.create_rectangle(x * box_size, y*box_size, (x+1)*box_size, (y+1)
 #Define start and end nodes
 canvas.itemconfig(grid[7][0], fill = "green")
 canvas.itemconfig(grid[7][24], fill = "red")
-
-
 
 def findColor(event):
     global color
@@ -48,7 +49,6 @@ def drag(event):
 canvas.bind("<Button-1>", click)
 canvas.bind("<B1-Motion>", drag)
 
-
 def createMaze():
     maze = []
     for y in range(15):
@@ -67,13 +67,26 @@ def startPathfinding():
     maze = createMaze()
     # print(maze)
     path = a_star.astar(maze, start, end)
-    for node in path:
-        x = node[1]
-        y = node[0]
-        if canvas.itemcget(grid[y][x], "fill") != "red" and canvas.itemcget(grid[y][x], "fill") != "green":
-            canvas.itemconfig(grid[y][x], fill = "light blue")
+    if path == []:
+        CTkMessagebox(master=root, title="Error", message="There is no possible path", icon="cancel")
 
-startButton = ctk.CTkButton(root, text="Find Path", command=startPathfinding)
-startButton.pack()
+    else:
+        for node in path:
+            x = node[1]
+            y = node[0]
+            if canvas.itemcget(grid[y][x], "fill") != "red" and canvas.itemcget(grid[y][x], "fill") != "green":
+                canvas.itemconfig(grid[y][x], fill = "light blue")
+    
+def clear():
+    for y in range(15):
+        for x in range(25):
+            if canvas.itemcget(grid[y][x], "fill") == "black" or canvas.itemcget(grid[y][x], "fill") == "light blue":
+                canvas.itemconfig(grid[y][x], fill = "white")
+
+
+startButton = ctk.CTkButton(root, text="Find Path", command=startPathfinding, font=('Helvetica', 20), height=40)
+startButton.grid(row=0, column=1)
+clearButton = ctk.CTkButton(root, text="Clear", command=clear, width=20, font=('Helvetica', 20), height=40)
+clearButton.grid(row=0, column=2)
 
 root.mainloop()
